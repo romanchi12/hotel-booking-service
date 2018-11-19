@@ -1,26 +1,43 @@
+insert into CUSTOMER(NAME) values ('Mykola');
+insert into CUSTOMER(NAME) values ('Roman');
+
 insert into CATEGORY(CATEGORY_ID,DESCRIPTION) values (1,'Single room');
 insert into CATEGORY(CATEGORY_ID,DESCRIPTION) values (2,'Double room');
 insert into CATEGORY(CATEGORY_ID,DESCRIPTION) values (3,'Quadriple room');
 
-insert into BOOKING_OPTION(DESCRIPTION, PRICE) values ('Breakfast', 100);
-insert into BOOKING_OPTION(DESCRIPTION, PRICE) values ('Parking', 50);
-insert into BOOKING_OPTION(DESCRIPTION, PRICE) values ('SPA', 150);
+insert into OPTION_TYPE(OPTION_TYPE_ID,DESCRIPTION) values (1,'Breakfast');
+insert into OPTION_TYPE(OPTION_TYPE_ID,DESCRIPTION) values (2,'Cleaning');
 
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 101, 200);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 102, 200);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 103, 200);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 104, 300);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 105, 300);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (1, 106, 500);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (2, 201, 200);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (2, 202, 200);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (2, 203, 300);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (2, 204, 500);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (3, 205, 500);
-insert into ROOM(CATEGORY_ID,NUMBER,PRICE) values (3, 206, 500);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (1, 1, 101, 200);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (2, 1, 102, 200);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (3, 1, 103, 200);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (4, 1, 104, 300);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (5, 1, 105, 300);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (6, 1, 106, 500);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (7, 2, 201, 200);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (8, 2, 202, 200);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (9, 2, 203, 300);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (10, 2, 204, 500);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (11, 3, 205, 500);
+insert into ROOM(ROOM_ID, CATEGORY_ID,NUMBER,PRICE) values (12, 3, 206, 500);
 
--- for testing
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,1,100);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,2,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,6,100);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,3,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,8,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (1,12,300);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,4,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,7,100);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,9,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,3,100);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,5,200);
+insert into ROOM_OPTION(OPTION_TYPE_ID, ROOM_ID, PRICE) values (2,11,100);
 
-insert into CLIENT(USERNAME) values ('Mykola');
 
-insert into BOOKING(USER_ID,ROOM_ID,FROM_DATE,UNTIL_DATE,PRICE) values (1, 4, '2018-11-01', '2018-11-03', 400);
+insert into BOOKING(CUSTOMER_ID,ROOM_ID,FROM_DATE,UNTIL_DATE,ROOM_PRICE,SUMMARY_PRICE) values (1, 12, '2019-01-01', '2019-05-01', 500, 800);
+
+insert into BOOKING_OPTION(OPTION_TYPE_ID,BOOKING_ID,PRICE) values (1,1,300);
+
+insert into BOOKING(CUSTOMER_ID,ROOM_ID,FROM_DATE,UNTIL_DATE,ROOM_PRICE,SUMMARY_PRICE) values (2, 12, '2019-08-01', '2019-10-01', 500, 500);
+

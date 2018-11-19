@@ -1,8 +1,9 @@
 package org.rodrigez.controller;
 
-import org.rodrigez.model.Category;
+import org.modelmapper.ModelMapper;
+import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.dto.CategoryDTO;
-import org.rodrigez.service.CategoryService;
+import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,17 +17,23 @@ import java.util.stream.Collectors;
 @RequestMapping("/categories")
 public class CategoriesResource {
     @Autowired
-    CategoryService categoryService;
+    InventoryService inventoryService;
+    @Autowired
+    ModelMapper modelMapper;
 
     @RequestMapping(value="{categoryId}", method = RequestMethod.GET)
     public CategoryDTO getCategory(@PathVariable(value = "categoryId") long categoryId){
-        Category category = categoryService.getCategory(categoryId);
-        return new CategoryDTO(category);
+        Category category = inventoryService.getCategory(categoryId);
+        return convertToDTO(category);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<CategoryDTO> getCategories(){
-        List<Category> entities = categoryService.getCategories();
-        return entities.stream().map(CategoryDTO::new).collect(Collectors.toList());
+        List<Category> entities = inventoryService.getCategories();
+        return entities.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private CategoryDTO convertToDTO(Category category){
+        return modelMapper.map(category, CategoryDTO.class);
     }
 }

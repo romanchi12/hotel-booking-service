@@ -1,13 +1,13 @@
 package org.rodrigez.validation;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserRequest {
+
     private String name;
-
-    public UserRequest(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

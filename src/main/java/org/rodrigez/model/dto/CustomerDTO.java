@@ -3,6 +3,7 @@ package org.rodrigez.model.dto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -10,17 +11,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RoomDTO implements Serializable {
+@NoArgsConstructor
+public class CustomerDTO implements Serializable {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     private long id;
-    private long categoryId;
-    private String categoryDescription;
-    private int number;
-    @JsonManagedReference
-    private List<RoomOptionDTO> roomOptionList;
+    private String name;
     @JsonManagedReference
     private List<BookingDTO> bookingList;
-    private int currentPrice;
+
 }

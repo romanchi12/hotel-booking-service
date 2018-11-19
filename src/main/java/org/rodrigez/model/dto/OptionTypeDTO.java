@@ -1,13 +1,15 @@
 package org.rodrigez.model.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 
 @Getter
 @Setter
-public class CategoryDTO implements Serializable {
+@NoArgsConstructor
+public class OptionTypeDTO implements Serializable {
 
     private static final long serialVersionUID = 4L;
 
