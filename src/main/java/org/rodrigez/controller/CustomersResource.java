@@ -1,21 +1,16 @@
 package org.rodrigez.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.rodrigez.configuration.ObjectMapperUtils;
-import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.domain.Customer;
-import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.CustomerDTO;
 import org.rodrigez.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
-public class UsersResource {
+@RequestMapping("/customers")
+public class CustomersResource {
     @Autowired
     CustomerService customerService;
     @Autowired
@@ -27,8 +22,19 @@ public class UsersResource {
         return convertToDTO(customer);
     }
 
+    @RequestMapping(method = RequestMethod.POST)
+    public CustomerDTO addCustomer(@RequestBody CustomerDTO dto){
+        Customer customer = convertToEntity(dto);
+        customerService.add(customer);
+        return convertToDTO(customer);
+    }
+
     private CustomerDTO convertToDTO(Customer customer){
-        //dto.setBookingList(ObjectMapperUtils.mapAll(customer.getBookingList(), BookingDTO.class));
         return modelMapper.map(customer,CustomerDTO.class);
+    }
+
+    private Customer convertToEntity(CustomerDTO dto){
+
+        return modelMapper.map(dto, Customer.class);
     }
 }

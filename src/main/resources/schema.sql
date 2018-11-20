@@ -1,5 +1,5 @@
 CREATE TABLE BOOKING (
-  BOOKING_ID    int NOT NULL auto_increment, 
+  BOOKING_ID    int NOT NULL auto_increment,
   CUSTOMER_ID   int NOT NULL, 
   ROOM_ID       int NOT NULL, 
   FROM_DATE     date NOT NULL, 
@@ -18,7 +18,7 @@ CREATE TABLE CATEGORY (
   DESCRIPTION varchar(255) NOT NULL, 
   PRIMARY KEY (CATEGORY_ID));
 CREATE TABLE CUSTOMER (
-  CUSTOMER_ID int NOT NULL auto_increment, 
+  CUSTOMER_ID int NOT NULL auto_increment,
   NAME        varchar(255) NOT NULL, 
   PRIMARY KEY (CUSTOMER_ID));
 CREATE TABLE OPTION_TYPE (

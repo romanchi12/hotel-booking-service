@@ -23,7 +23,7 @@ public class Room {
     private int number;
 
     @OneToMany(mappedBy = "room")
-    private List<RoomOption> roomOptionList = new LinkedList<>();
+    private List<RoomOption> optionList = new LinkedList<>();
 
     @OneToMany(mappedBy = "room")
     private List<Booking> bookingList = new LinkedList<>();

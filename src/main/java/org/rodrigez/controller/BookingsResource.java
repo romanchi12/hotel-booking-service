@@ -4,10 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.service.BookingService;
-import org.rodrigez.validation.BookingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,12 +33,23 @@ public class BookingsResource {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public BookingDTO addBooking(@RequestBody BookingRequest request) {
-        Booking booking = bookingService.add(request);
+    public BookingDTO addBooking(@RequestBody BookingDTO bookingDTO) throws ParseException {
+        Booking booking = convertToEntity(bookingDTO);
+        bookingService.add(booking);
         return convertToDTO(booking);
     }
 
     private BookingDTO convertToDTO(Booking booking){
-        return modelMapper.map(booking,BookingDTO.class);
+        BookingDTO dto = modelMapper.map(booking, BookingDTO.class);
+        dto.setFromDate(booking.getFrom());
+        dto.setUntilDate(booking.getUntil());
+        return dto;
+    }
+
+    private Booking convertToEntity(BookingDTO dto) throws ParseException {
+        Booking booking = modelMapper.map(dto, Booking.class);
+        booking.setFrom(dto.getFromDate());
+        booking.setUntil(dto.getUntilDate());
+        return booking;
     }
 }

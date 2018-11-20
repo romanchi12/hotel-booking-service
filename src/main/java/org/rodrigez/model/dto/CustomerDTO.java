@@ -1,7 +1,5 @@
 package org.rodrigez.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +16,6 @@ public class CustomerDTO implements Serializable {
 
     private long id;
     private String name;
-    @JsonManagedReference
     private List<BookingDTO> bookingList;
 
 }

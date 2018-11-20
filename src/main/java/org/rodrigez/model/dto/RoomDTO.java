@@ -1,7 +1,5 @@
 package org.rodrigez.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,9 +16,7 @@ public class RoomDTO implements Serializable {
     private long categoryId;
     private String categoryDescription;
     private int number;
-    @JsonManagedReference
-    private List<RoomOptionDTO> roomOptionList;
-    @JsonManagedReference
+    private List<RoomOptionDTO> optionList;
     private List<BookingDTO> bookingList;
     private int currentPrice;
 }

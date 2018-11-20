@@ -5,7 +5,7 @@ import org.rodrigez.model.domain.Room;
 import org.rodrigez.repository.RoomRepository;
 import org.rodrigez.service.AvailabilityService;
 import org.rodrigez.service.InventoryService;
-import org.rodrigez.validation.DateRange;
+import org.rodrigez.util.DateRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

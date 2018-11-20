@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Booking {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BOOKING_ID")
     private long id;
 
@@ -21,7 +22,7 @@ public class Booking {
     @JoinColumn(name="CUSTOMER_ID")
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="ROOM_ID")
     private Room room;
 
@@ -31,17 +32,12 @@ public class Booking {
     @Column(name = "UNTIL_DATE")
     private Date until;
 
-    @OneToMany(mappedBy = "booking")
-    private List<BookingOption> bookingOptionList = new LinkedList<>();
+    @OneToMany(mappedBy = "booking",cascade = {CascadeType.PERSIST})
+    private List<BookingOption> optionList = new LinkedList<>();
 
     @Column(name = "ROOM_PRICE")
     private int roomPrice;
 
     @Column(name = "SUMMARY_PRICE")
     private int summaryPrice;
-
-    public void addBookingOption(OptionType optionType, int price){
-        BookingOption bookingOption = new BookingOption(this, optionType,price);
-        bookingOptionList.add(bookingOption);
-    }
 }
