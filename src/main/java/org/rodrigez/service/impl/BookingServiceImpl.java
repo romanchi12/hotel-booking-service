@@ -35,6 +35,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<Booking> getCustomerBookings(long customerId) {
+        Customer customer = customerService.getCustomer(customerId);
+        return bookingRepository.findAllByCustomer(customer);
+    }
+
+    @Override
     public Booking add(Booking booking){
 
         long customerId = booking.getCustomer().getId();

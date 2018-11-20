@@ -6,6 +6,7 @@ import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.dto.BookingDTO;
+import org.rodrigez.model.dto.BookingPriceDTO;
 import org.rodrigez.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,19 @@ public class BookingsResource {
     public ApiResponse getBooking(@PathVariable("bookingId") long bookingId){
         try {
             Booking booking = bookingService.getBooking(bookingId);
-            return new ApiResponse(Status.OK, convertToDTO(booking));
+            BookingDTO bookingDTO = convertToDTO(booking);
+            return new ApiResponse(Status.OK, bookingDTO);
+        } catch (Exception e){
+            return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
+        }
+    }
+
+    @GetMapping(value = "/{bookingId}/price")
+    public ApiResponse getBookingPrice(@PathVariable("bookingId") long bookingId){
+        try {
+            Booking booking = bookingService.getBooking(bookingId);
+            BookingPriceDTO priceDTO = convertToPriceDTO(booking);
+            return new ApiResponse(Status.OK, priceDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
@@ -49,10 +62,15 @@ public class BookingsResource {
         try {
             Booking booking = convertToEntity(bookingDTO);
             bookingService.add(booking);
-            return new ApiResponse(Status.OK, convertToDTO(booking));
+            BookingDTO newBookingDTO = convertToDTO(booking);
+            return new ApiResponse(Status.OK, newBookingDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
+    }
+
+    private BookingPriceDTO convertToPriceDTO(Booking booking){
+        return modelMapper.map(booking, BookingPriceDTO.class);
     }
 
     private BookingDTO convertToDTO(Booking booking){

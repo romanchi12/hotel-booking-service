@@ -1,22 +1,32 @@
 package org.rodrigez.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.sql.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class BookingDTO implements Serializable {
-
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    static {
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Kiev");
+        dateFormat.setTimeZone(timeZone);
+    }
+
     private static final long serialVersionUID = 1L;
 
     private long id;
@@ -40,11 +50,13 @@ public class BookingDTO implements Serializable {
         this.untilDate = dateFormat.format(untilDate);
     }
 
-    public Date getFromDate() throws ParseException {
-        return dateFormat.parse(fromDate);
+    public Date getFromDate(){
+        LocalDate localDate = LocalDate.parse(fromDate, dateTimeFormatter);
+        return Date.valueOf(localDate);
     }
 
-    public Date getUntilDate() throws ParseException {
-        return dateFormat.parse(untilDate);
+    public Date getUntilDate(){
+        LocalDate localDate = LocalDate.parse(untilDate, dateTimeFormatter);
+        return Date.valueOf(localDate);
     }
 }

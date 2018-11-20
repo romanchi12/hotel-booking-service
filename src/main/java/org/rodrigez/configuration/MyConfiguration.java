@@ -7,6 +7,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 @Configuration
 public class MyConfiguration {
     @Bean
@@ -17,5 +20,13 @@ public class MyConfiguration {
                 setMatchingStrategy(MatchingStrategies.STANDARD).
                 setFieldAccessLevel(AccessLevel.PRIVATE);
         return modelMapper;
+    }
+
+    @Bean
+    public SimpleDateFormat dateFormat(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Kiev");
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat;
     }
 }

@@ -10,12 +10,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CustomerDTO implements Serializable {
+public class BookingPriceDTO implements Serializable {
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 8L;
 
     private long id;
-    private String name;
-    private List<BookingDTO> bookingList;
-
+    private int roomPrice;
+    private List<BookingOptionDTO> optionList;
+    private int summaryPrice;
 }
