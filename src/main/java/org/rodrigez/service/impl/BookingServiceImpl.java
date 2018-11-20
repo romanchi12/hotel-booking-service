@@ -4,11 +4,13 @@ import org.rodrigez.model.domain.*;
 import org.rodrigez.repository.BookingOptionRepository;
 import org.rodrigez.repository.BookingRepository;
 import org.rodrigez.service.*;
-import org.rodrigez.util.DateRange;
+import org.rodrigez.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -23,7 +25,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBooking(long bookingId) {
-        return bookingRepository.getOne(bookingId);
+        return bookingRepository.findById(bookingId).orElseThrow(
+                () -> new NotFoundException("Invalid bookingId " + bookingId));
     }
 
     @Override
@@ -34,15 +37,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking add(Booking booking){
 
-        Customer customer = customerService.getCustomer(booking.getCustomer().getId());
+        long customerId = booking.getCustomer().getId();
+        Customer customer = customerService.getCustomer(customerId);
         booking.setCustomer(customer);
         customer.addBooking(booking);
 
         long roomId = booking.getRoom().getId();
         Room room = inventoryService.getRoom(roomId);
         booking.setRoom(room);
-
-
 
         int optionsPrice = 0;
         for(BookingOption bookingOption: booking.getOptionList()){
@@ -61,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
 
         int roomPrice = room.getCurrentPrice();
         int oneDayPrice = roomPrice + optionsPrice;
-        int days = (int) DateRange.daysInRange(booking.getFrom(),booking.getUntil());
+        int days = daysBetween(booking.getFrom(),booking.getUntil());
         int summaryPrice = days * oneDayPrice;
         booking.setRoomPrice(roomPrice);
         booking.setSummaryPrice(summaryPrice);
@@ -69,5 +71,10 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
 
         return booking;
+    }
+
+    private int daysBetween(Date from, Date until){
+        long diff = until.getTime() - from.getTime();
+        return (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 }

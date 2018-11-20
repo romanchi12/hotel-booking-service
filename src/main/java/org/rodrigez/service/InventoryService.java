@@ -6,14 +6,15 @@ import org.rodrigez.model.domain.Room;
 import org.rodrigez.model.domain.RoomOption;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InventoryService {
     List<Category> getCategories();
     Category getCategory(long categoryId);
     List<OptionType> getOptionTypes();
     OptionType getOptionType(long optionTypeId);
-    List<RoomOption> getRoomOptions(long roomId, List<Long> optionIdList);
     RoomOption getRoomOption(long roomId, long optionTypeId);
-    List<Room> getRooms();
     Room getRoom(long roomId);
+    List<Room> getRooms();
+    List<Room> getRoomsByCategoryId(long categoryId);
 }

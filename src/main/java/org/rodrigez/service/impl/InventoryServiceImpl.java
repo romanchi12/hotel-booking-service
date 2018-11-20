@@ -1,18 +1,15 @@
 package org.rodrigez.service.impl;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.domain.OptionType;
 import org.rodrigez.model.domain.Room;
 import org.rodrigez.model.domain.RoomOption;
-import org.rodrigez.model.ids.RoomOptionId;
 import org.rodrigez.repository.*;
 import org.rodrigez.service.InventoryService;
+import org.rodrigez.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +18,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Autowired
     CategoryRepository categoryRepository;
     @Autowired
-    OptionRepository optionRepository;
+    OptionTypeRepository optionTypeRepository;
     @Autowired
     RoomRepository roomRepository;
     @Autowired
@@ -33,35 +30,28 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Category getCategory(long categoryId) {
-        return categoryRepository.getOne(categoryId);
+    public Category getCategory(long categoryId) throws NotFoundException {
+        return categoryRepository.findById(categoryId).orElseThrow(
+                () -> new NotFoundException("Invalid categoryId" + categoryId));
     }
 
     @Override
     public List<OptionType> getOptionTypes() {
-        return optionRepository.findAll();
+        return optionTypeRepository.findAll();
     }
 
     @Override
-    public OptionType getOptionType(long optionId) {
-        return optionRepository.getOne(optionId);
+    public OptionType getOptionType(long optionTypeId) throws NotFoundException {
+        return optionTypeRepository.findById(optionTypeId).orElseThrow(
+                () -> new NotFoundException("Invalid optionTypeId " + optionTypeId));
     }
 
     @Override
-    public List<RoomOption> getRoomOptions(long roomId, List<Long> optionTypeIdList) {
-        List<RoomOption> optionList = new ArrayList<>();
-        for(long optionTypeId: optionTypeIdList){
-            optionList.add(getRoomOption(roomId,optionTypeId));
-        }
-        return optionList;
-    }
-
-    @Override
-    @NotFound(action = NotFoundAction.IGNORE)
-    public RoomOption getRoomOption(long roomId, long optionTypeId){
+    public RoomOption getRoomOption(long roomId, long optionTypeId) throws NotFoundException {
         Room room = getRoom(roomId);
         OptionType optionType = getOptionType(optionTypeId);
-        return roomOptionRepository.getOne(new RoomOptionId(room,optionType));
+        return roomOptionRepository.findByRoomAndOptionType(room, optionType).orElseThrow(
+                () -> new NotFoundException("Invalid roomOption, roomId " + roomId + ", optionTypeId " + optionTypeId));
     }
 
     @Override
@@ -70,7 +60,14 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Room getRoom(long roomId) {
-        return roomRepository.getOne(roomId);
+    public Room getRoom(long roomId) throws NotFoundException {
+        return roomRepository.findById(roomId).orElseThrow(
+                () -> new NotFoundException("Not Found. Invalid roomId " + roomId));
+    }
+
+    @Override
+    public List<Room> getRoomsByCategoryId(long categoryId) {
+        return roomRepository.findAllByCategory_Id(categoryId).orElseThrow(
+                () -> new NotFoundException("Invalid categoryId " + categoryId));
     }
 }

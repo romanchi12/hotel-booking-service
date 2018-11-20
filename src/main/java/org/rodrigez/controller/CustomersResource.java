@@ -2,6 +2,8 @@ package org.rodrigez.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.rodrigez.controller.response.ApiResponse;
+import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Customer;
 import org.rodrigez.model.dto.CustomerDTO;
 import org.rodrigez.service.CustomerService;
@@ -16,17 +18,21 @@ public class CustomersResource {
     @Autowired
     ModelMapper modelMapper;
 
-    @RequestMapping(value = "/{userId}",method = RequestMethod.GET)
-    public CustomerDTO getCustomer(@PathVariable(value = "userId") long userId){
-        Customer customer = customerService.getCustomer(userId);
-        return convertToDTO(customer);
+    @GetMapping(value = "/{userId}")
+    public ApiResponse getCustomer(@PathVariable(value = "userId") long userId){
+        try {
+            Customer customer = customerService.getCustomer(userId);
+            return new ApiResponse(Status.OK, convertToDTO(customer));
+        } catch (Exception e){
+            return new ApiResponse(Status.ERROR, e.getMessage());
+        }
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public CustomerDTO addCustomer(@RequestBody CustomerDTO dto){
+    @PostMapping
+    public ApiResponse addCustomer(@RequestBody CustomerDTO dto){
         Customer customer = convertToEntity(dto);
         customerService.add(customer);
-        return convertToDTO(customer);
+        return new ApiResponse(Status.OK, convertToDTO(customer));
     }
 
     private CustomerDTO convertToDTO(Customer customer){
@@ -34,7 +40,6 @@ public class CustomersResource {
     }
 
     private Customer convertToEntity(CustomerDTO dto){
-
         return modelMapper.map(dto, Customer.class);
     }
 }

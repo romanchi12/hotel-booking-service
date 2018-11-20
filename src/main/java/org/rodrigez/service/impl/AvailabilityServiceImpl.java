@@ -5,10 +5,12 @@ import org.rodrigez.model.domain.Room;
 import org.rodrigez.repository.RoomRepository;
 import org.rodrigez.service.AvailabilityService;
 import org.rodrigez.service.InventoryService;
-import org.rodrigez.util.DateRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -19,49 +21,64 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     InventoryService inventoryService;
 
     @Override
-    public List<Room> getAvailabilityRooms(Long categoryId, String from, String until) {
-
-        List<Room> availableRooms = getAvailableRooms(from,until);
-        List<Room> roomsInCategory = getRoomsByCategoryId(categoryId);
+    public List<Room> getAvailabilityRooms(Long categoryId, String from, String until) throws ParseException {
 
         List<Room> filtered = inventoryService.getRooms();
-        filtered.retainAll(availableRooms);
-        filtered.retainAll(roomsInCategory);
+
+        if(categoryId!=null){
+            List<Room> roomsInCategory = inventoryService.getRoomsByCategoryId(categoryId);
+            filtered.retainAll(roomsInCategory);
+        }
+
+        if(from!=null&&until!=null){
+            List<Room> availableRooms = getAvailableRooms(from,until);
+            filtered.retainAll(availableRooms);
+        }
 
         return filtered;
     }
 
-    private List<Room> getRoomsByCategoryId(Long categoryId) {
-        if(categoryId==null){
-            return inventoryService.getRooms();
-        }
-        return roomRepository.findAllByCategory_Id(categoryId);
-    }
-
-    private List<Room> getAvailableRooms(String from, String until) {
-        if(from==null||until==null){
-            return inventoryService.getRooms();
-        }
-        DateRange dateRange = new DateRange(from,until);
+    private List<Room> getAvailableRooms(String from, String until) throws ParseException {
+        DateInterval interval = new DateInterval(from,until);
         List<Room> available = new ArrayList<>();
         for(Room room: inventoryService.getRooms()){
-            if(isAvailableRoom(room, dateRange)){
+            if(isAvailableRoom(room, interval)){
                 available.add(room);
             }
         }
         return available;
     }
 
-    private boolean isAvailableRoom(Room room, DateRange dateRange){
+    private boolean isAvailableRoom(Room room, DateInterval dateInterval){
         List<Booking> bookingList = room.getBookingList();
-        Date from, until;
         for(Booking booking : bookingList){
-            from = booking.getFrom();
-            until = booking.getUntil();
-            if(dateRange.isInRange(from)||dateRange.isInRange(until)){
+            if(dateInterval.overlaps(booking)){
                 return false;
             }
         }
         return true;
+    }
+
+    private class DateInterval {
+
+        private Date intervalFrom;
+        private Date intervalUntil;
+
+        DateInterval(String fromString, String untilString) throws ParseException {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            intervalFrom = dateFormat.parse(fromString);
+            intervalUntil = dateFormat.parse(untilString);
+        }
+
+        boolean overlaps(Booking booking){
+            Date bookingFrom = booking.getFrom();
+            Date bookingUntil = booking.getUntil();
+            return this.isInInterval(bookingFrom) && this.isInInterval(bookingUntil);
+        }
+
+        boolean isInInterval(Date date){
+            return (intervalFrom.compareTo(date) >= 0 || intervalUntil.compareTo(date) <= 0);
+        }
+
     }
 }
