@@ -1,24 +1,20 @@
 package org.rodrigez.model.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.stereotype.Component;
+import org.rodrigez.model.domain.*;
 
 import java.io.Serializable;
-import java.text.ParseException;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class BookingDTO implements Serializable {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -42,21 +38,58 @@ public class BookingDTO implements Serializable {
     private int roomPrice;
     private int summaryPrice;
 
-    public void setFromDate(Date fromDate){
-        this.fromDate = dateFormat.format(fromDate);
+    public BookingDTO(){
     }
 
-    public void setUntilDate(Date untilDate){
-        this.untilDate = dateFormat.format(untilDate);
+    public BookingDTO(Booking booking) {
+        this.id = booking.getId();
+        this.customerId = booking.getCustomer().getId();
+        this.customerName = booking.getCustomer().getName();
+        this.roomId = booking.getRoom().getId();
+        this.roomCategoryId = booking.getRoom().getCategory().getId();
+        this.roomCategoryDescription = booking.getRoom().getCategory().getDescription();
+        this.roomNumber = booking.getRoom().getNumber();
+        this.fromDate = dateFormat.format(booking.getFrom());
+        this.untilDate = dateFormat.format(booking.getUntil());
+        optionList = new ArrayList<>();
+        for(BookingOption option: booking.getOptionList()){
+            BookingOptionDTO optionDTO = new BookingOptionDTO(option);
+            optionList.add(optionDTO);
+        }
+        this.roomPrice = booking.getRoomPrice();
+        this.summaryPrice = booking.getSummaryPrice();
     }
 
-    public Date getFromDate(){
-        LocalDate localDate = LocalDate.parse(fromDate, dateTimeFormatter);
-        return Date.valueOf(localDate);
-    }
+    public Booking toEntity(){
+        Booking booking = new Booking();
 
-    public Date getUntilDate(){
-        LocalDate localDate = LocalDate.parse(untilDate, dateTimeFormatter);
-        return Date.valueOf(localDate);
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setName(customerName);
+        booking.setCustomer(customer);
+
+        Room room = new Room();
+        room.setId(roomId);
+        Category category = new Category();
+        category.setId(roomCategoryId);
+        category.setDescription(roomCategoryDescription);
+        room.setCategory(category);
+        room.setNumber(roomNumber);
+        booking.setRoom(room);
+
+        booking.setFrom(Date.valueOf(LocalDate.parse(fromDate, dateTimeFormatter)));
+        booking.setUntil(Date.valueOf(LocalDate.parse(untilDate, dateTimeFormatter)));
+
+        List<BookingOption> optionList = new ArrayList<>();
+        for(BookingOptionDTO optionDTO: this.optionList){
+            BookingOption bookingOption = optionDTO.toEntity();
+            optionList.add(bookingOption);
+        }
+        booking.setOptionList(optionList);
+
+        booking.setRoomPrice(roomPrice);
+        booking.setSummaryPrice(summaryPrice);
+
+        return booking;
     }
 }

@@ -1,6 +1,5 @@
 package org.rodrigez.controller;
 
-import org.modelmapper.ModelMapper;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
@@ -22,8 +21,6 @@ public class CustomersResource {
     CustomerService customerService;
     @Autowired
     BookingService bookingService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @GetMapping(value = "/{customerId}")
     public ApiResponse getCustomer(@PathVariable(value = "customerId") long customerId){
@@ -61,17 +58,14 @@ public class CustomersResource {
     }
 
     private BookingDTO convertToDTO(Booking booking){
-        BookingDTO dto = modelMapper.map(booking, BookingDTO.class);
-        dto.setFromDate(booking.getFrom());
-        dto.setUntilDate(booking.getUntil());
-        return dto;
+        return new BookingDTO(booking);
     }
 
     private CustomerDTO convertToDTO(Customer customer){
-        return modelMapper.map(customer,CustomerDTO.class);
+        return new CustomerDTO(customer);
     }
 
     private Customer convertToEntity(CustomerDTO dto){
-        return modelMapper.map(dto, Customer.class);
+        return dto.toEntity();
     }
 }

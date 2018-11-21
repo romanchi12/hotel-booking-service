@@ -3,6 +3,7 @@ package org.rodrigez.model.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.rodrigez.model.dto.BookingOptionDTO;
 import org.rodrigez.model.ids.BookingOptionId;
 
 import javax.persistence.*;

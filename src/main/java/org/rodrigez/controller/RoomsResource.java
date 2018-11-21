@@ -1,6 +1,5 @@
 package org.rodrigez.controller;
 
-import org.modelmapper.ModelMapper;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Room;
@@ -10,7 +9,6 @@ import org.rodrigez.service.AvailabilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,14 +19,13 @@ public class RoomsResource {
     AvailabilityService availabilityService;
     @Autowired
     InventoryService inventoryService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @GetMapping(value = "/{roomId}")
     public ApiResponse getRoom(@PathVariable("roomId") long roomId){
         try {
             Room room = inventoryService.getRoom(roomId);
-            return new ApiResponse(Status.OK,convertToDTO(room));
+            RoomDTO roomDTO = convertToDTO(room);
+            return new ApiResponse(Status.OK, roomDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR,e.getMessage());
         }
@@ -51,6 +48,6 @@ public class RoomsResource {
     }
 
     private RoomDTO convertToDTO(Room room){
-        return modelMapper.map(room, RoomDTO.class);
+        return new RoomDTO(room);
     }
 }

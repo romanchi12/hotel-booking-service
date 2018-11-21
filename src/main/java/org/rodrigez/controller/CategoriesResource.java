@@ -1,6 +1,5 @@
 package org.rodrigez.controller;
 
-import org.modelmapper.ModelMapper;
 import org.rodrigez.controller.response.ApiError;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
@@ -8,7 +7,10 @@ import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.dto.CategoryDTO;
 import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,14 +20,13 @@ import java.util.stream.Collectors;
 public class CategoriesResource {
     @Autowired
     InventoryService inventoryService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @GetMapping(value="{categoryId}")
     public ApiResponse getCategory(@PathVariable(value = "categoryId") long categoryId){
         try {
             Category category = inventoryService.getCategory(categoryId);
-            return new ApiResponse(Status.OK, convertToDTO(category));
+            CategoryDTO dto = convertToDTO(category);
+            return new ApiResponse(Status.OK, dto);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
@@ -39,6 +40,6 @@ public class CategoriesResource {
     }
 
     private CategoryDTO convertToDTO(Category category){
-        return modelMapper.map(category, CategoryDTO.class);
+        return new CategoryDTO(category);
     }
 }

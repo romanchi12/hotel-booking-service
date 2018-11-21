@@ -3,6 +3,7 @@ package org.rodrigez.model.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.rodrigez.model.domain.OptionType;
 
 import java.io.Serializable;
 
@@ -15,4 +16,9 @@ public class OptionTypeDTO implements Serializable {
 
     private long id;
     private String description;
+
+    public OptionTypeDTO(OptionType optionType) {
+        id = optionType.getId();
+        description = optionType.getDescription();
+    }
 }

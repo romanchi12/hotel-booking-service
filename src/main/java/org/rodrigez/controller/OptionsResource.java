@@ -1,6 +1,5 @@
 package org.rodrigez.controller;
 
-import org.modelmapper.ModelMapper;
 import org.rodrigez.controller.response.ApiError;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
@@ -8,7 +7,10 @@ import org.rodrigez.model.domain.OptionType;
 import org.rodrigez.model.dto.OptionTypeDTO;
 import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +20,6 @@ import java.util.stream.Collectors;
 public class OptionsResource {
     @Autowired
     InventoryService inventoryService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @GetMapping
     public ApiResponse getOptions(){
@@ -39,6 +39,6 @@ public class OptionsResource {
     }
 
     private OptionTypeDTO convertToDTO(OptionType optionType){
-        return modelMapper.map(optionType, OptionTypeDTO.class);
+        return new OptionTypeDTO(optionType);
     }
 }

@@ -2,7 +2,6 @@ package org.rodrigez.controller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.modelmapper.ModelMapper;
 import org.rodrigez.model.domain.OptionType;
 import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +23,6 @@ public class OptionsResourceTest {
 
     @MockBean
     private InventoryService inventoryService;
-
-    @MockBean
-    ModelMapper modelMapper;
 
     @Test
     public void getOptions(){

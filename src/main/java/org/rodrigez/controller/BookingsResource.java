@@ -1,6 +1,5 @@
 package org.rodrigez.controller;
 
-import org.modelmapper.ModelMapper;
 import org.rodrigez.controller.response.ApiError;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 public class BookingsResource {
     @Autowired
     BookingService bookingService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @GetMapping(value = "/{bookingId}")
     public ApiResponse getBooking(@PathVariable("bookingId") long bookingId){
@@ -70,20 +67,14 @@ public class BookingsResource {
     }
 
     private BookingPriceDTO convertToPriceDTO(Booking booking){
-        return modelMapper.map(booking, BookingPriceDTO.class);
+        return new BookingPriceDTO(booking);
     }
 
     private BookingDTO convertToDTO(Booking booking){
-        BookingDTO dto = modelMapper.map(booking, BookingDTO.class);
-        dto.setFromDate(booking.getFrom());
-        dto.setUntilDate(booking.getUntil());
-        return dto;
+        return new BookingDTO(booking);
     }
 
-    private Booking convertToEntity(BookingDTO dto) throws ParseException {
-        Booking booking = modelMapper.map(dto, Booking.class);
-        booking.setFrom(dto.getFromDate());
-        booking.setUntil(dto.getUntilDate());
-        return booking;
+    private Booking convertToEntity(BookingDTO dto) {
+        return dto.toEntity();
     }
 }
