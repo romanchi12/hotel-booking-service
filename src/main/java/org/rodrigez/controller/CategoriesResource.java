@@ -25,7 +25,7 @@ public class CategoriesResource {
     public ApiResponse getCategory(@PathVariable(value = "categoryId") long categoryId){
         try {
             Category category = inventoryService.getCategory(categoryId);
-            CategoryDTO dto = convertToDTO(category);
+            CategoryDTO dto = new CategoryDTO(category);
             return new ApiResponse(Status.OK, dto);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
@@ -35,11 +35,7 @@ public class CategoriesResource {
     @GetMapping
     public ApiResponse getCategories(){
         List<Category> entities = inventoryService.getCategories();
-        List<CategoryDTO> dtoList = entities.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<CategoryDTO> dtoList = entities.stream().map(CategoryDTO::new).collect(Collectors.toList());
         return new ApiResponse(Status.OK, dtoList);
-    }
-
-    private CategoryDTO convertToDTO(Category category){
-        return new CategoryDTO(category);
     }
 }

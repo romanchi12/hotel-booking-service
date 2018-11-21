@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rodrigez.controller.response.ApiError;
+import org.rodrigez.controller.response.ApiResponse;
+import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.dto.CategoryDTO;
 import org.rodrigez.service.InventoryService;
@@ -22,7 +25,6 @@ import java.util.stream.Collectors;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
@@ -37,8 +39,13 @@ public class CategoriesResourceTest {
 
     private List<Category> categoryList;
 
+    private ObjectMapper objectMapper;
+
     @Before
     public void init(){
+
+        objectMapper = new ObjectMapper();
+
         Category category1 = new Category();
         category1.setId(0);
         category1.setDescription("Standart");
@@ -53,17 +60,16 @@ public class CategoriesResourceTest {
     @Test
     public void testGetCategories() throws Exception {
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        when(inventoryService.getCategories()).thenReturn(categoryList);
+
         List<CategoryDTO> categoryDTOList = categoryList.stream().map(CategoryDTO::new).collect(Collectors.toList());
 
-        String expected = "{\"status\":\"OK\",\"data\":" + objectMapper.writeValueAsString(categoryDTOList) + "}";
+        ApiResponse response = new ApiResponse(Status.OK, categoryDTOList);
 
-        when(inventoryService.getCategories()).thenReturn(categoryList);
+        String expected = objectMapper.writeValueAsString(response);
 
         this.mvc.perform(
                 get("/categories").accept(MediaType.APPLICATION_JSON_UTF8)
-        ).andExpect(
-                status().is(200)
         ).andExpect(
                 content().string(expected)
         );
@@ -72,15 +78,13 @@ public class CategoriesResourceTest {
     @Test
     public void testGetCategory_OK() throws Exception {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Category categoryIn_0 = categoryList.get(0);
 
         when(inventoryService.getCategory(0)).thenReturn(categoryIn_0);
 
-        CategoryDTO categoryDTO = new CategoryDTO(categoryIn_0);
+        ApiResponse response = new ApiResponse(Status.OK, new CategoryDTO(categoryIn_0));
 
-        String expected = "{\"status\":\"OK\",\"data\":" + objectMapper.writeValueAsString(categoryDTO) + "}";
+        String expected = objectMapper.writeValueAsString(response);
 
         this.mvc.perform(
                 get("/categories/0").accept(MediaType.APPLICATION_JSON_UTF8)
@@ -88,14 +92,18 @@ public class CategoriesResourceTest {
                 content().string(expected)
         );
 
-
     }
 
     @Test
     public void testGetCategory_Error() throws Exception{
-        when(inventoryService.getCategory(2)).thenThrow(new NotFoundException("Invalid categoryId " + 2));
 
-        String expected = "{\"status\":\"ERROR\",\"error\":{\"description\":\"Invalid categoryId 2\"}}";
+        Exception exception = new NotFoundException("Invalid categoryId " + 2);
+
+        when(inventoryService.getCategory(2)).thenThrow(exception);
+
+        ApiResponse response = new ApiResponse(Status.ERROR, new ApiError(exception.getMessage()));
+
+        String expected = objectMapper.writeValueAsString(response);
 
         this.mvc.perform(
                 get("/categories/2").accept(MediaType.APPLICATION_JSON_UTF8)

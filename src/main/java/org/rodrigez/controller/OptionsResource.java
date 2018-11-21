@@ -24,7 +24,7 @@ public class OptionsResource {
     @GetMapping
     public ApiResponse getOptions(){
         List<OptionType> entities = inventoryService.getOptionTypes();
-        List<OptionTypeDTO> dtoList = entities.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<OptionTypeDTO> dtoList = entities.stream().map(OptionTypeDTO::new).collect(Collectors.toList());
         return new ApiResponse(Status.OK, dtoList);
     }
 
@@ -32,13 +32,10 @@ public class OptionsResource {
     public ApiResponse getOption(@PathVariable(value = "optionId") long optionId){
         try {
             OptionType optionType = inventoryService.getOptionType(optionId);
-            return new ApiResponse(Status.OK, convertToDTO(optionType));
+            OptionTypeDTO dto = new OptionTypeDTO(optionType);
+            return new ApiResponse(Status.OK, dto);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
-    }
-
-    private OptionTypeDTO convertToDTO(OptionType optionType){
-        return new OptionTypeDTO(optionType);
     }
 }

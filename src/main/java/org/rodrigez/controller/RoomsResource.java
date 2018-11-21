@@ -24,7 +24,7 @@ public class RoomsResource {
     public ApiResponse getRoom(@PathVariable("roomId") long roomId){
         try {
             Room room = inventoryService.getRoom(roomId);
-            RoomDTO roomDTO = convertToDTO(room);
+            RoomDTO roomDTO = new RoomDTO(room);
             return new ApiResponse(Status.OK, roomDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR,e.getMessage());
@@ -39,15 +39,11 @@ public class RoomsResource {
 
         try {
             List<Room> entityList = availabilityService.getAvailabilityRooms(categoryId,from,until);
-            List<RoomDTO> dtoList = entityList.stream().map(this::convertToDTO).collect(Collectors.toList());
+            List<RoomDTO> dtoList = entityList.stream().map(RoomDTO::new).collect(Collectors.toList());
             return new ApiResponse(Status.OK, dtoList);
         } catch (Exception e) {
             return new ApiResponse(Status.ERROR, e.getMessage());
         }
 
-    }
-
-    private RoomDTO convertToDTO(Room room){
-        return new RoomDTO(room);
     }
 }

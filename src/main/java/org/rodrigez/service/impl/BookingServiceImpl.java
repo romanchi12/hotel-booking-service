@@ -4,6 +4,7 @@ import org.rodrigez.model.domain.*;
 import org.rodrigez.repository.BookingOptionRepository;
 import org.rodrigez.repository.BookingRepository;
 import org.rodrigez.service.*;
+import org.rodrigez.service.exceptions.NotAvailableRoomException;
 import org.rodrigez.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +18,11 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     BookingRepository bookingRepository;
     @Autowired
-    BookingOptionRepository bookingOptionRepository;
-    @Autowired
     InventoryService inventoryService;
     @Autowired
     CustomerService customerService;
+    @Autowired
+    AvailabilityService availabilityService;
 
     @Override
     public Booking getBooking(long bookingId) {
@@ -41,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking add(Booking booking){
+    public Booking add(Booking booking) throws Exception {
 
         long customerId = booking.getCustomer().getId();
         Customer customer = customerService.getCustomer(customerId);
@@ -51,6 +52,11 @@ public class BookingServiceImpl implements BookingService {
         long roomId = booking.getRoom().getId();
         Room room = inventoryService.getRoom(roomId);
         booking.setRoom(room);
+
+        DateInterval interval = new DateInterval(booking.getFrom(), booking.getUntil());
+        if(!availabilityService.isAvailableRoom(room, interval)){
+            throw new NotAvailableRoomException("Not available room for date interval " + interval);
+        }
 
         int optionsPrice = 0;
         for(BookingOption bookingOption: booking.getOptionList()){

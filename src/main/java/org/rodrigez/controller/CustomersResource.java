@@ -26,7 +26,7 @@ public class CustomersResource {
     public ApiResponse getCustomer(@PathVariable(value = "customerId") long customerId){
         try {
             Customer customer = customerService.getCustomer(customerId);
-            CustomerDTO dto = convertToDTO(customer);
+            CustomerDTO dto = new CustomerDTO(customer);
             return new ApiResponse(Status.OK, dto);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, e.getMessage());
@@ -36,10 +36,10 @@ public class CustomersResource {
     @PostMapping
     public ApiResponse addCustomer(@RequestBody CustomerDTO dto){
         try {
-            Customer customer = convertToEntity(dto);
+            Customer customer = dto.toEntity();
             customerService.add(customer);
-            CustomerDTO newCustomerDTO = convertToDTO(customer);
-            return new ApiResponse(Status.OK, newCustomerDTO);
+            CustomerDTO newDTO = new CustomerDTO(customer);
+            return new ApiResponse(Status.OK, newDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, e.getMessage());
         }
@@ -50,22 +50,10 @@ public class CustomersResource {
     public ApiResponse getCustomerBookings(@PathVariable(value = "customerId") long customerId){
         try {
             List<Booking> bookingList = bookingService.getCustomerBookings(customerId);
-            List<BookingDTO> dtoList = bookingList.stream().map(this::convertToDTO).collect(Collectors.toList());
+            List<BookingDTO> dtoList = bookingList.stream().map(BookingDTO::new).collect(Collectors.toList());
             return new ApiResponse(Status.OK, dtoList);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, e.getMessage());
         }
-    }
-
-    private BookingDTO convertToDTO(Booking booking){
-        return new BookingDTO(booking);
-    }
-
-    private CustomerDTO convertToDTO(Customer customer){
-        return new CustomerDTO(customer);
-    }
-
-    private Customer convertToEntity(CustomerDTO dto){
-        return dto.toEntity();
     }
 }

@@ -7,6 +7,7 @@ import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.BookingPriceDTO;
 import org.rodrigez.service.BookingService;
+import org.rodrigez.service.exceptions.NotAvailableRoomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class BookingsResource {
     public ApiResponse getBooking(@PathVariable("bookingId") long bookingId){
         try {
             Booking booking = bookingService.getBooking(bookingId);
-            BookingDTO bookingDTO = convertToDTO(booking);
+            BookingDTO bookingDTO = new BookingDTO(booking);
             return new ApiResponse(Status.OK, bookingDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
@@ -36,7 +37,7 @@ public class BookingsResource {
     public ApiResponse getBookingPrice(@PathVariable("bookingId") long bookingId){
         try {
             Booking booking = bookingService.getBooking(bookingId);
-            BookingPriceDTO priceDTO = convertToPriceDTO(booking);
+            BookingPriceDTO priceDTO = new BookingPriceDTO(booking);
             return new ApiResponse(Status.OK, priceDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
@@ -47,7 +48,7 @@ public class BookingsResource {
     public ApiResponse getBookings(){
         try {
             List<Booking> entityList = bookingService.getBookings();
-            List<BookingDTO> dtoList = entityList.stream().map(this::convertToDTO).collect(Collectors.toList());
+            List<BookingDTO> dtoList = entityList.stream().map(BookingDTO::new).collect(Collectors.toList());
             return new ApiResponse(Status.OK, dtoList);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
@@ -57,24 +58,12 @@ public class BookingsResource {
     @PostMapping
     public ApiResponse addBooking(@RequestBody BookingDTO bookingDTO) throws ParseException {
         try {
-            Booking booking = convertToEntity(bookingDTO);
+            Booking booking = bookingDTO.toEntity();
             bookingService.add(booking);
-            BookingDTO newBookingDTO = convertToDTO(booking);
+            BookingDTO newBookingDTO = new BookingDTO(booking);
             return new ApiResponse(Status.OK, newBookingDTO);
         } catch (Exception e){
             return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
-    }
-
-    private BookingPriceDTO convertToPriceDTO(Booking booking){
-        return new BookingPriceDTO(booking);
-    }
-
-    private BookingDTO convertToDTO(Booking booking){
-        return new BookingDTO(booking);
-    }
-
-    private Booking convertToEntity(BookingDTO dto) {
-        return dto.toEntity();
     }
 }
