@@ -1,11 +1,13 @@
 package org.rodrigez.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.dto.CategoryDTO;
 import org.rodrigez.service.InventoryService;
+import org.rodrigez.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -33,25 +35,30 @@ public class CategoriesResourceTest {
     @MockBean
     private InventoryService inventoryService;
 
+    private List<Category> categoryList;
+
+    @Before
+    public void init(){
+        Category category1 = new Category();
+        category1.setId(0);
+        category1.setDescription("Standart");
+
+        Category category2 = new Category();
+        category2.setId(1);
+        category2.setDescription("Lux");
+
+        categoryList = Arrays.asList(category1,category2);
+    }
+
     @Test
     public void testGetCategories() throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        assertNotNull(inventoryService);
+        List<CategoryDTO> categoryDTOList = categoryList.stream().map(CategoryDTO::new).collect(Collectors.toList());
 
-        Category category1 = new Category();
-        category1.setId(1);
-        category1.setDescription("Standart");
-
-        Category category2 = new Category();
-        category2.setId(2);
-        category2.setDescription("Lux");
-
-        List<Category> categoryList = Arrays.asList(category1,category2);
+        String expected = "{\"status\":\"OK\",\"data\":" + objectMapper.writeValueAsString(categoryDTOList) + "}";
 
         when(inventoryService.getCategories()).thenReturn(categoryList);
-
-        String expected = "{\"status\":\"OK\",\"data\":" + objectMapper.writeValueAsString(categoryList) + "}";
 
         this.mvc.perform(
                 get("/categories").accept(MediaType.APPLICATION_JSON_UTF8)
@@ -63,25 +70,35 @@ public class CategoriesResourceTest {
     }
 
     @Test
-    public void testGetCategory() throws Exception {
+    public void testGetCategory_OK() throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        assertNotNull(inventoryService);
 
-        Category category1 = new Category();
-        category1.setId(1);
-        category1.setDescription("Standart");
+        Category categoryIn_0 = categoryList.get(0);
 
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(category1.getId());
-        categoryDTO.setDescription(category1.getDescription());
+        when(inventoryService.getCategory(0)).thenReturn(categoryIn_0);
 
-        when(inventoryService.getCategory(1)).thenReturn(category1);
+        CategoryDTO categoryDTO = new CategoryDTO(categoryIn_0);
 
         String expected = "{\"status\":\"OK\",\"data\":" + objectMapper.writeValueAsString(categoryDTO) + "}";
 
         this.mvc.perform(
-                get("/categories/1").accept(MediaType.APPLICATION_JSON_UTF8)
+                get("/categories/0").accept(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                content().string(expected)
+        );
+
+
+    }
+
+    @Test
+    public void testGetCategory_Error() throws Exception{
+        when(inventoryService.getCategory(2)).thenThrow(new NotFoundException("Invalid categoryId " + 2));
+
+        String expected = "{\"status\":\"ERROR\",\"error\":{\"description\":\"Invalid categoryId 2\"}}";
+
+        this.mvc.perform(
+                get("/categories/2").accept(MediaType.APPLICATION_JSON_UTF8)
         ).andExpect(
                 content().string(expected)
         );
