@@ -7,6 +7,6 @@ import java.text.ParseException;
 import java.util.List;
 
 public interface AvailabilityService {
-    List<Room> getAvailabilityRooms(Long categoryId, String from, String until) throws ParseException;
-    boolean isAvailableRoom(Room room, DateInterval dateInterval);
+    List<Room> getAvailabilityRooms(Long categoryId, String from, String until) throws Exception;
+    boolean isAvailableRoom(Room room, DateInterval dateInterval) throws Exception;
 }

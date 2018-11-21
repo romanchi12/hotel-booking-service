@@ -17,7 +17,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     InventoryService inventoryService;
 
     @Override
-    public List<Room> getAvailabilityRooms(Long categoryId, String from, String until) throws ParseException {
+    public List<Room> getAvailabilityRooms(Long categoryId, String from, String until) throws Exception {
 
         List<Room> filtered = inventoryService.getRooms();
 
@@ -34,7 +34,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return filtered;
     }
 
-    private List<Room> getAvailableRooms(String from, String until) throws ParseException {
+    private List<Room> getAvailableRooms(String from, String until) throws Exception {
         DateInterval interval = new DateInterval(from,until);
         List<Room> available = new ArrayList<>();
         for(Room room: inventoryService.getRooms()){
@@ -46,10 +46,11 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     }
 
     @Override
-    public boolean isAvailableRoom(Room room, DateInterval dateInterval){
+    public boolean isAvailableRoom(Room room, DateInterval checkedInterval) throws Exception {
         List<Booking> bookingList = room.getBookingList();
         for(Booking booking : bookingList){
-            if(dateInterval.overlaps(booking)){
+            DateInterval reservedInterval = new DateInterval(booking.getFrom(),booking.getUntil());
+            if(checkedInterval.overlaps(reservedInterval)){
                 return false;
             }
         }

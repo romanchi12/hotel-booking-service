@@ -1,6 +1,6 @@
 package org.rodrigez.service;
 
-import org.rodrigez.model.domain.Booking;
+import org.rodrigez.service.exceptions.DateIntervalException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,36 +9,34 @@ import java.util.Date;
 
 public class DateInterval {
 
-    private Date intervalFrom;
-    private Date intervalUntil;
+    private Date from;
+    private Date until;
 
-    public DateInterval(String fromString, String untilString) throws ParseException {
+    public DateInterval(String fromString, String untilString) throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        intervalFrom = dateFormat.parse(fromString);
-        intervalUntil = dateFormat.parse(untilString);
+        from = dateFormat.parse(fromString);
+        until = dateFormat.parse(untilString);
+        if(from.after(until)) throw new DateIntervalException("From before until");
     }
 
-    public Date getIntervalFrom() {
-        return intervalFrom;
+    public Date getFrom() {
+        return from;
     }
 
-    public Date getIntervalUntil() {
-        return intervalUntil;
+    public Date getUntil() {
+        return until;
     }
 
-    public DateInterval(Date intervalFrom, Date intervalUntil) {
-        this.intervalFrom = intervalFrom;
-        this.intervalUntil = intervalUntil;
+    public DateInterval(Date intervalFrom, Date until) throws Exception {
+        this.from = intervalFrom;
+        this.until = until;
+        if(from.after(until)) throw new DateIntervalException("From before until");
     }
 
-    public boolean overlaps(Booking booking){
-        Date bookingFrom = booking.getFrom();
-        Date bookingUntil = booking.getUntil();
-        return this.isInInterval(bookingFrom) && this.isInInterval(bookingUntil);
-    }
-
-    boolean isInInterval(Date date){
-        return (intervalFrom.compareTo(date) >= 0 || intervalUntil.compareTo(date) <= 0);
+    public boolean overlaps(DateInterval checked){
+        boolean checkedFromBeforeIntervalUntil = checked.getFrom().compareTo(until)<0;
+        boolean checkedUntilAfterIntervalFrom = checked.getUntil().compareTo(from)>0;
+        return checkedFromBeforeIntervalUntil && checkedUntilAfterIntervalFrom;
     }
 
 }
