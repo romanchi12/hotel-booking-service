@@ -54,7 +54,8 @@ public class BookingServiceImpl implements BookingService {
 
         DateInterval interval = new DateInterval(booking.getFrom(), booking.getUntil());
         if(!availabilityService.isAvailableRoom(room, interval)){
-            throw new NotAvailableRoomException("Not available room for date interval " + interval);
+            throw new NotAvailableRoomException("Not available room for date interval " +
+                    interval.getFrom() + " " + interval.getUntil());
         }
 
         int optionsPrice = 0;

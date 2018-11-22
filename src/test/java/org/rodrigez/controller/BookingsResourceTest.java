@@ -1,25 +1,18 @@
 package org.rodrigez.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.rodrigez.controller.response.ApiResponse;
-import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.domain.Customer;
 import org.rodrigez.model.domain.Room;
 import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.BookingPriceDTO;
-import org.rodrigez.model.dto.CustomerDTO;
 import org.rodrigez.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,11 +25,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = BookingsResource.class, secure = false)
@@ -58,17 +51,18 @@ public class BookingsResourceTest {
     @Test
     public void getBooking() throws Exception {
 
+        long id = 1;
+
         Booking booking = mockBooking();
         BookingDTO dto = new BookingDTO(booking);
+        String expected = mapper.writeValueAsString(dto);
 
-        long id = 1;
         when(this.bookingService.getBooking(id)).thenReturn(booking);
-
-        ApiResponse response = new ApiResponse(Status.OK, dto);
-        String expected = mapper.writeValueAsString(response);
 
         this.mvc.perform(
                 get("/bookings/" + id).accept(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                status().isOk()
         ).andExpect(
                 content().string(expected)
         );
@@ -77,17 +71,18 @@ public class BookingsResourceTest {
     @Test
     public void getBookingPrice() throws Exception {
 
+        long id = 1;
+
         Booking booking = mockBooking();
         BookingPriceDTO dto = new BookingPriceDTO(booking);
+        String expected = mapper.writeValueAsString(dto);
 
-        long id = 1;
         when(this.bookingService.getBooking(id)).thenReturn(booking);
 
-        ApiResponse response = new ApiResponse(Status.OK, dto);
-        String expected = mapper.writeValueAsString(response);
-
         this.mvc.perform(
-                get("/bookings/" + id + "/price").accept(MediaType.APPLICATION_JSON_UTF8)
+                get("/bookings/" + id + "/price").accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
         ).andExpect(
                 content().string(expected)
         );
@@ -98,14 +93,14 @@ public class BookingsResourceTest {
 
         List<Booking> bookingList = Collections.singletonList(mockBooking());
         List<BookingDTO> dtoList = bookingList.stream().map(BookingDTO::new).collect(Collectors.toList());
+        String expected = mapper.writeValueAsString(dtoList);
 
         when(this.bookingService.getBookings()).thenReturn(bookingList);
 
-        ApiResponse response = new ApiResponse(Status.OK, dtoList);
-        String expected = mapper.writeValueAsString(response);
-
         this.mvc.perform(
                 get("/bookings").accept(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                status().isOk()
         ).andExpect(
                 content().string(expected)
         );
@@ -118,10 +113,9 @@ public class BookingsResourceTest {
         Booking booking = dto.toEntity();
         Booking newBooking = mockBooking();
         BookingDTO newDTO = new BookingDTO(newBooking);
+        String expected = mapper.writeValueAsString(newDTO);
 
         when(this.bookingService.add(booking)).thenReturn(newBooking);
-        ApiResponse response = new ApiResponse(Status.OK, newDTO);
-        String expected = mapper.writeValueAsString(response);
 
         this.mvc.perform(
                 post("/bookings").contentType(MediaType.APPLICATION_JSON_UTF8).content(

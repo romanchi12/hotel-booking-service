@@ -1,14 +1,9 @@
 package org.rodrigez.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.rodrigez.controller.response.ApiError;
-import org.rodrigez.controller.response.ApiResponse;
-import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.domain.Customer;
@@ -26,18 +21,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = CustomersResource.class, secure = false)
@@ -52,28 +46,26 @@ public class CustomersResourceTest {
     @MockBean
     BookingService bookingService;
 
-    private ObjectMapper objectMapper;
-
-    @Before
-    public void init() {
-        objectMapper = new ObjectMapper();
-    }
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Test
     public void getCustomer_OK() throws Exception {
 
-        long id =1;
-        Customer customer = Mockito.mock(Customer.class);
-        when(this.customerService.getCustomer(1)).thenReturn(customer);
-        CustomerDTO dto = new CustomerDTO(customer);
-        ApiResponse response = new ApiResponse(Status.OK, dto);
+        long id = 1;
 
-        String expected = objectMapper.writeValueAsString(response);
+        Customer customer = Mockito.mock(Customer.class);
+        CustomerDTO dto = new CustomerDTO(customer);
+
+        when(this.customerService.getCustomer(1)).thenReturn(customer);
+
+        String expected = mapper.writeValueAsString(dto);
 
         this.mvc.perform(
                 get("/customers/" + id).accept(MediaType.APPLICATION_JSON_UTF8)
         ).andExpect(
                 content().string(expected)
+        ).andExpect(
+                status().isOk()
         );
     }
 
@@ -81,17 +73,15 @@ public class CustomersResourceTest {
     public void getCustomer_Error() throws Exception {
 
         long id = 10;
+
         Exception exception = new NotFoundException("Invalid customerId " + id);
 
         when(this.customerService.getCustomer(10)).thenThrow(exception);
 
-        ApiResponse response = new ApiResponse(Status.ERROR, new ApiError(exception.getMessage()));
-        String expected = objectMapper.writeValueAsString(response);
-
         this.mvc.perform(
                 get("/customers/" + id).accept(MediaType.APPLICATION_JSON_UTF8)
         ).andExpect(
-                content().string(expected)
+                status().isNotFound()
         );
     }
 
@@ -108,18 +98,21 @@ public class CustomersResourceTest {
         newCustomer.setName("Mykola");
         newCustomer.setBookingList(new ArrayList<>());
 
+        CustomerDTO newDTO = new CustomerDTO(customer);
+
         when(this.customerService.add(customer)).thenReturn(newCustomer);
 
-        ApiResponse response = new ApiResponse(Status.OK, new CustomerDTO(newCustomer));
-
-        String expected = objectMapper.writeValueAsString(response);
+        String expected = mapper.writeValueAsString(newDTO);
 
         this.mvc.perform(
                 post("/customers").contentType(MediaType.APPLICATION_JSON_UTF8).content(
-                        objectMapper.writeValueAsString(dto)
+                        mapper.writeValueAsString(dto)
                 )
         ).andExpect(
-                MockMvcResultMatchers.content().string(expected));
+                content().string(expected)
+        ).andExpect(
+                status().isCreated()
+        );
 
     }
 
@@ -128,6 +121,24 @@ public class CustomersResourceTest {
 
         long customerId = 1;
 
+        List<Booking> bookingList = mockBookingList(customerId);
+        List<BookingDTO> dtoList = bookingList.stream().map(BookingDTO::new).collect(Collectors.toList());
+
+        when(this.bookingService.getCustomerBookings(customerId)).thenReturn(bookingList);
+
+        String expected = mapper.writeValueAsString(dtoList);
+
+        this.mvc.perform(
+                get("/customers/" + customerId + "/bookings").contentType(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                content().string(expected)
+        ).andExpect(
+                status().isOk()
+        );
+
+    }
+
+    private List<Booking> mockBookingList(long customerId){
         Customer customer = new Customer();
         customer.setId(customerId);
         Booking booking = new Booking();
@@ -148,18 +159,6 @@ public class CustomersResourceTest {
 
         customer.setBookingList(bookingList);
 
-        when(this.bookingService.getCustomerBookings(customer.getId())).thenReturn(bookingList);
-
-        List<BookingDTO> dtoList = bookingList.stream().map(BookingDTO::new).collect(Collectors.toList());
-
-        ApiResponse response = new ApiResponse(Status.OK, dtoList);
-
-        String expected = objectMapper.writeValueAsString(response);
-
-        this.mvc.perform(
-                get("/customers/" + customerId + "/bookings").contentType(MediaType.APPLICATION_JSON_UTF8)
-        ).andExpect(
-                MockMvcResultMatchers.content().string(expected));
-
+        return customer.getBookingList();
     }
 }

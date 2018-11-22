@@ -1,12 +1,11 @@
 package org.rodrigez.controller;
 
-import org.rodrigez.controller.response.ApiError;
-import org.rodrigez.controller.response.ApiResponse;
-import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Category;
 import org.rodrigez.model.dto.CategoryDTO;
 import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,20 +21,16 @@ public class CategoriesResource {
     InventoryService inventoryService;
 
     @GetMapping(value="{categoryId}")
-    public ApiResponse getCategory(@PathVariable(value = "categoryId") long categoryId){
-        try {
-            Category category = inventoryService.getCategory(categoryId);
-            CategoryDTO dto = new CategoryDTO(category);
-            return new ApiResponse(Status.OK, dto);
-        } catch (Exception e){
-            return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
-        }
+    public ResponseEntity getCategory(@PathVariable(value = "categoryId") long categoryId){
+        Category category = inventoryService.getCategory(categoryId);
+        CategoryDTO dto = new CategoryDTO(category);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @GetMapping
-    public ApiResponse getCategories(){
+    public ResponseEntity getCategories(){
         List<Category> entities = inventoryService.getCategories();
         List<CategoryDTO> dtoList = entities.stream().map(CategoryDTO::new).collect(Collectors.toList());
-        return new ApiResponse(Status.OK, dtoList);
+        return new ResponseEntity(dtoList, HttpStatus.OK);
     }
 }
