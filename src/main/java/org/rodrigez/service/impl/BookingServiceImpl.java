@@ -24,7 +24,7 @@ public class BookingServiceImpl implements BookingService {
     AvailabilityService availabilityService;
 
     @Override
-    public Booking getBooking(long bookingId) {
+    public Booking getBooking(long bookingId) throws NotFoundException {
         return bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Invalid bookingId " + bookingId));
     }

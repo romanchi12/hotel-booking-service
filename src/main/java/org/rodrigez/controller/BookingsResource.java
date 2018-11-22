@@ -5,9 +5,7 @@ import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.BookingPriceDTO;
 import org.rodrigez.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

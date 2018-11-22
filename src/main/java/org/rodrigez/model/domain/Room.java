@@ -1,7 +1,6 @@
 package org.rodrigez.model.domain;
 
 import lombok.Data;
-import org.rodrigez.model.dto.RoomDTO;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -32,12 +31,4 @@ public class Room {
     @Column(name = "PRICE")
     private int currentPrice;
 
-    @Override
-    public String toString() {
-        return "Room{" +
-                "id=" + id +
-                ", category=" + category +
-                ", number=" + number +
-                '}';
-    }
 }
