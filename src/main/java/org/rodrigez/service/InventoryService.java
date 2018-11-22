@@ -6,7 +6,6 @@ import org.rodrigez.model.domain.Room;
 import org.rodrigez.model.domain.RoomOption;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface InventoryService {
     List<Category> getCategories();

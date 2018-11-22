@@ -1,7 +1,6 @@
 package org.rodrigez.repository;
 
 import org.rodrigez.model.domain.Customer;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

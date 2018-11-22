@@ -3,7 +3,6 @@ package org.rodrigez.service;
 import org.rodrigez.service.exceptions.DateIntervalException;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

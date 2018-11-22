@@ -1,5 +1,6 @@
 package org.rodrigez.controller;
 
+import org.rodrigez.controller.response.ApiError;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
@@ -29,7 +30,7 @@ public class CustomersResource {
             CustomerDTO dto = new CustomerDTO(customer);
             return new ApiResponse(Status.OK, dto);
         } catch (Exception e){
-            return new ApiResponse(Status.ERROR, e.getMessage());
+            return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
     }
 
@@ -41,7 +42,7 @@ public class CustomersResource {
             CustomerDTO newDTO = new CustomerDTO(customer);
             return new ApiResponse(Status.OK, newDTO);
         } catch (Exception e){
-            return new ApiResponse(Status.ERROR, e.getMessage());
+            return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
 
     }
@@ -53,7 +54,7 @@ public class CustomersResource {
             List<BookingDTO> dtoList = bookingList.stream().map(BookingDTO::new).collect(Collectors.toList());
             return new ApiResponse(Status.OK, dtoList);
         } catch (Exception e){
-            return new ApiResponse(Status.ERROR, e.getMessage());
+            return new ApiResponse(Status.ERROR, new ApiError(e.getMessage()));
         }
     }
 }

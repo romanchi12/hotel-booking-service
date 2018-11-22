@@ -5,8 +5,8 @@ import org.junit.runner.RunWith;
 import org.rodrigez.model.domain.OptionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,20 +15,18 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-class OptionTypeRepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
+@Transactional
+public class OptionTypeRepositoryTest {
 
     @Autowired
     private OptionTypeRepository optionTypeRepository;
 
     @Test
-    void findById() {
+    public void findById() {
         OptionType optionType = new OptionType();
-        optionType.setId(1);
+        optionType.setId(10);
         optionType.setDescription("Test description");
-        entityManager.persist(optionType);
+        optionTypeRepository.save(optionType);
 
         Optional<OptionType> found = optionTypeRepository.findById(optionType.getId());
 

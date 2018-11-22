@@ -1,7 +1,6 @@
 package org.rodrigez.model.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.domain.Customer;
@@ -36,7 +35,7 @@ public class CustomerDTO implements Serializable {
         Customer customer = new Customer();
         customer.setId(id);
         customer.setName(name);
-        List<Booking> bookingList = new ArrayList<Booking>();
+        List<Booking> bookingList = new ArrayList<>();
         for(BookingDTO bookingDTO : this.bookingList){
             Booking booking = bookingDTO.toEntity();
             bookingList.add(booking);

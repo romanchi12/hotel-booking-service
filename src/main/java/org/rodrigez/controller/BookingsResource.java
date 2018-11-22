@@ -7,11 +7,9 @@ import org.rodrigez.model.domain.Booking;
 import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.BookingPriceDTO;
 import org.rodrigez.service.BookingService;
-import org.rodrigez.service.exceptions.NotAvailableRoomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,10 +54,10 @@ public class BookingsResource {
     }
 
     @PostMapping
-    public ApiResponse addBooking(@RequestBody BookingDTO bookingDTO) throws ParseException {
+    public ApiResponse addBooking(@RequestBody BookingDTO bookingDTO) {
         try {
             Booking booking = bookingDTO.toEntity();
-            bookingService.add(booking);
+            booking = bookingService.add(booking);
             BookingDTO newBookingDTO = new BookingDTO(booking);
             return new ApiResponse(Status.OK, newBookingDTO);
         } catch (Exception e){

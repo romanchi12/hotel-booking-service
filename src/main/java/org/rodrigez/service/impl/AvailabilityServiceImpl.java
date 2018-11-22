@@ -8,7 +8,6 @@ import org.rodrigez.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -34,7 +33,8 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return filtered;
     }
 
-    private List<Room> getAvailableRooms(String from, String until) throws Exception {
+    @Override
+    public List<Room> getAvailableRooms(String from, String until) throws Exception {
         DateInterval interval = new DateInterval(from,until);
         List<Room> available = new ArrayList<>();
         for(Room room: inventoryService.getRooms()){

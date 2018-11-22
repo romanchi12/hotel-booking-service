@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.rodrigez.controller.response.ApiError;
 import org.rodrigez.controller.response.ApiResponse;
 import org.rodrigez.controller.response.Status;
 import org.rodrigez.model.domain.Booking;
@@ -16,6 +17,7 @@ import org.rodrigez.model.dto.BookingDTO;
 import org.rodrigez.model.dto.CustomerDTO;
 import org.rodrigez.service.BookingService;
 import org.rodrigez.service.CustomerService;
+import org.rodrigez.service.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,9 +33,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = CustomersResource.class, secure = false)
@@ -56,8 +60,39 @@ public class CustomersResourceTest {
     }
 
     @Test
-    public void getCustomer() {
+    public void getCustomer_OK() throws Exception {
 
+        long id =1;
+        Customer customer = Mockito.mock(Customer.class);
+        when(this.customerService.getCustomer(1)).thenReturn(customer);
+        CustomerDTO dto = new CustomerDTO(customer);
+        ApiResponse response = new ApiResponse(Status.OK, dto);
+
+        String expected = objectMapper.writeValueAsString(response);
+
+        this.mvc.perform(
+                get("/customers/" + id).accept(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                content().string(expected)
+        );
+    }
+
+    @Test
+    public void getCustomer_Error() throws Exception {
+
+        long id = 10;
+        Exception exception = new NotFoundException("Invalid customerId " + id);
+
+        when(this.customerService.getCustomer(10)).thenThrow(exception);
+
+        ApiResponse response = new ApiResponse(Status.ERROR, new ApiError(exception.getMessage()));
+        String expected = objectMapper.writeValueAsString(response);
+
+        this.mvc.perform(
+                get("/customers/" + id).accept(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(
+                content().string(expected)
+        );
     }
 
     @Test

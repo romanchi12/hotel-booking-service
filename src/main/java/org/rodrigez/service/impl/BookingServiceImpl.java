@@ -1,7 +1,6 @@
 package org.rodrigez.service.impl;
 
 import org.rodrigez.model.domain.*;
-import org.rodrigez.repository.BookingOptionRepository;
 import org.rodrigez.repository.BookingRepository;
 import org.rodrigez.service.*;
 import org.rodrigez.service.exceptions.NotAvailableRoomException;
@@ -83,6 +82,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
 
         return booking;
+
     }
 
     private int daysBetween(Date from, Date until){
